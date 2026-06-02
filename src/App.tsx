@@ -1,7 +1,11 @@
+import { Heading } from '@navikt/ds-react/Typography';
+
 function App() {
 	return (
 		<>
-			<h1>Forenklet saksbehandlingssystem for foreldrepenger</h1>
+			<Heading level="1" size="large">
+				Forenklet saksbehandlingssystem for foreldrepenger
+			</Heading>
 		</>
 	);
 }
