@@ -5,9 +5,12 @@ import type { BehandletSoknad } from './api/types';
 import SoknadListe from './components/SoknadListe';
 import { Page } from '@navikt/ds-react/Page';
 import { Box } from '@navikt/ds-react';
+import Soknadsside from './components/Soknadsside';
 
 function App() {
 	const [soknader, setSoknader] = useState<BehandletSoknad[]>([]);
+	const [valgtSoknad, setValgtSoknad] = useState<BehandletSoknad | null>(null);
+	const [side, setSide] = useState(1);
 
 	useEffect(() => {
 		hentSoknader().then(setSoknader);
@@ -23,7 +26,19 @@ function App() {
 				</Box>
 			</Page.Block>
 			<Page.Block as="main" width="xl" gutters>
-				<SoknadListe soknader={soknader} />
+				{valgtSoknad ? (
+					<Soknadsside
+						behandletSoknad={valgtSoknad}
+						onTilbake={() => setValgtSoknad(null)}
+					/>
+				) : (
+					<SoknadListe
+						soknader={soknader}
+						onVelgSoknad={setValgtSoknad}
+						side={side}
+						onSideEndring={setSide}
+					/>
+				)}
 			</Page.Block>
 		</Page>
 	);

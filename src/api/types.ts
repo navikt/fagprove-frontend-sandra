@@ -15,6 +15,12 @@ export type Vedtak =
 			};
 	  };
 
+export type Inntekt = {
+	maned: string;
+	type: string;
+	belop: number;
+};
+
 export type Soknad = {
 	id: string;
 	beskrivelse: string;
@@ -22,6 +28,7 @@ export type Soknad = {
 	erNorskBorger: boolean;
 	termindato: string;
 	oppgittArsinntekt: number;
+	inntektshistorikk: Inntekt[];
 	antallBarn: number;
 	rettsforhold: string;
 	dekningsgrad: number;
