@@ -35,7 +35,7 @@ function SoknadInfo({ behandletSoknad }: Props) {
 				</HStack>
 			</Box>
 
-			<HGrid columns={2} gap="space-8">
+			<HGrid columns={{ xs: 1, md: 2 }} gap="space-8">
 				<Soknadsdetaljer soknad={soknad} />
 				<Vedtaksdetaljer vedtak={vedtak} />
 			</HGrid>

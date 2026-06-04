@@ -125,7 +125,7 @@ function StikkproveModal({ soknader, open, onClose }: Props) {
 									Velg et eller flere filtre for å se saker
 								</InlineMessage>
 							) : (
-								<Table size="small">
+								<Table size="small" zebraStripes>
 									<Table.Header>
 										<Table.Row>
 											<Table.HeaderCell>Id</Table.HeaderCell>

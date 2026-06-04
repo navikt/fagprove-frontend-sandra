@@ -9,6 +9,7 @@ import {
 } from '@navikt/ds-react';
 import type { BehandletSoknad } from '../api/types';
 import StikkproveModal from '../components/StikkproveModal';
+import VedtakTag from '../components/VedtakTag';
 
 const ANTALL_SOKNADER_PER_SIDE = 5;
 
@@ -41,35 +42,37 @@ function SoknadListe({ soknader, onVelgSoknad, side, onSideEndring }: Props) {
 					Stikkprøvekontroll
 				</Button>
 			</HStack>
-			<Table>
-				<Table.Header>
-					<Table.Row>
-						<Table.HeaderCell>Id</Table.HeaderCell>
-						<Table.HeaderCell>Fødselsnummer</Table.HeaderCell>
-						<Table.HeaderCell>Termindato</Table.HeaderCell>
-						<Table.HeaderCell>Handling</Table.HeaderCell>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{synligeSoknader.map((behandletSoknad) => (
-						<Table.Row key={behandletSoknad.soknad.id}>
-							<Table.DataCell>{behandletSoknad.soknad.id}</Table.DataCell>
-							<Table.DataCell>{behandletSoknad.soknad.fnr}</Table.DataCell>
-							<Table.DataCell>
-								{behandletSoknad.soknad.termindato}
-							</Table.DataCell>
-							<Table.DataCell>
-								<Button
-									size="small"
-									onClick={() => onVelgSoknad(behandletSoknad)}
-								>
-									Åpne sak
-								</Button>
-							</Table.DataCell>
+			<div style={{ overflowX: 'auto' }}>
+				<Table zebraStripes>
+					<Table.Header>
+						<Table.Row>
+							<Table.HeaderCell>Id</Table.HeaderCell>
+							<Table.HeaderCell>Fødselsnummer</Table.HeaderCell>
+							<Table.HeaderCell>Vedtak</Table.HeaderCell>
+							<Table.HeaderCell>Handling</Table.HeaderCell>
 						</Table.Row>
-					))}
-				</Table.Body>
-			</Table>
+					</Table.Header>
+					<Table.Body>
+						{synligeSoknader.map((behandletSoknad) => (
+							<Table.Row key={behandletSoknad.soknad.id}>
+								<Table.DataCell>{behandletSoknad.soknad.id}</Table.DataCell>
+								<Table.DataCell>{behandletSoknad.soknad.fnr}</Table.DataCell>
+								<Table.DataCell>
+									<VedtakTag type={behandletSoknad.vedtak.type} />
+								</Table.DataCell>
+								<Table.DataCell>
+									<Button
+										size="small"
+										onClick={() => onVelgSoknad(behandletSoknad)}
+									>
+										Åpne sak
+									</Button>
+								</Table.DataCell>
+							</Table.Row>
+						))}
+					</Table.Body>
+				</Table>
+			</div>
 			{antallSider > 1 && (
 				<Pagination
 					page={side}
