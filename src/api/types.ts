@@ -1,7 +1,7 @@
 export type Vedtak =
-	| { type: 'Avslag' }
-	| { type: 'Engangsstonad' }
-	| { type: 'ManuellVurdering' }
+	| { type: 'Avslag'; begrunnelse: string }
+	| { type: 'Engangsstonad'; begrunnelse: string; belop: number }
+	| { type: 'ManuellVurdering'; begrunnelse: string }
 	| {
 			type: 'Innvilget';
 			beregningsgrunnlag: number;

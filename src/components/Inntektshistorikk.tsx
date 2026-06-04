@@ -6,7 +6,7 @@ type Props = {
 };
 
 function formaterManed(maned: string) {
-	const [, manedNr] = maned.split('-');
+	const [aar, manedNr] = maned.split('-');
 	const manedNavn = [
 		'Januar',
 		'Februar',
@@ -21,7 +21,7 @@ function formaterManed(maned: string) {
 		'November',
 		'Desember',
 	];
-	return manedNavn[parseInt(manedNr) - 1] ?? maned;
+	return `${manedNavn[parseInt(manedNr) - 1] ?? maned} ${aar}`;
 }
 
 function formaterInntektstype(type: string) {
@@ -49,7 +49,7 @@ function formaterInntektstype(type: string) {
 
 function Inntektshistorikk({ inntektshistorikk }: Props) {
 	return (
-		<Box padding="space-16">
+		<Box background="neutral-soft" padding="space-16" borderRadius="4">
 			<Heading level="3" size="small" spacing>
 				Inntektshistorikk
 			</Heading>
