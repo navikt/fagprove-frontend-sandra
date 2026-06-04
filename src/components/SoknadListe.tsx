@@ -1,5 +1,14 @@
-import { Button, Heading, Pagination, Table, VStack } from '@navikt/ds-react';
+import { useState } from 'react';
+import {
+	Button,
+	Heading,
+	HStack,
+	Pagination,
+	Table,
+	VStack,
+} from '@navikt/ds-react';
 import type { BehandletSoknad } from '../api/types';
+import StikkproveModal from './StikkproveModal';
 
 const ANTALL_SOKNADER_PER_SIDE = 5;
 
@@ -11,6 +20,7 @@ type Props = {
 };
 
 function SoknadListe({ soknader, onVelgSoknad, side, onSideEndring }: Props) {
+	const [visStikkprove, setVisStikkprove] = useState(false);
 	const antallSider = Math.ceil(soknader.length / ANTALL_SOKNADER_PER_SIDE);
 	const synligeSoknader = soknader.slice(
 		(side - 1) * ANTALL_SOKNADER_PER_SIDE,
@@ -19,9 +29,18 @@ function SoknadListe({ soknader, onVelgSoknad, side, onSideEndring }: Props) {
 
 	return (
 		<VStack gap="space-12">
-			<Heading level="2" size="medium" spacing>
-				Søknader
-			</Heading>
+			<HStack justify="space-between" align="center">
+				<Heading level="2" size="medium">
+					Søknader
+				</Heading>
+				<Button
+					variant="secondary-neutral"
+					size="small"
+					onClick={() => setVisStikkprove(true)}
+				>
+					Stikkprøvekontroll
+				</Button>
+			</HStack>
 			<Table>
 				<Table.Header>
 					<Table.Row>
@@ -59,6 +78,11 @@ function SoknadListe({ soknader, onVelgSoknad, side, onSideEndring }: Props) {
 					size="small"
 				/>
 			)}
+			<StikkproveModal
+				soknader={soknader}
+				open={visStikkprove}
+				onClose={() => setVisStikkprove(false)}
+			/>
 		</VStack>
 	);
 }
