@@ -1,8 +1,8 @@
 import { Button, VStack } from '@navikt/ds-react';
 import { ChevronLeftIcon } from '@navikt/aksel-icons';
 import type { BehandletSoknad } from '../api/types';
-import SoknadInfo from './SoknadInfo';
-import Inntektshistorikk from './Inntektshistorikk';
+import SoknadInfo from '../components/SoknadInfo';
+import Inntektshistorikk from '../components/Inntektshistorikk';
 
 type Props = {
 	behandletSoknad: BehandletSoknad;

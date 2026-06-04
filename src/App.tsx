@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Heading } from '@navikt/ds-react/Typography';
 import { hentSoknader } from './api/api';
 import type { BehandletSoknad } from './api/types';
-import SoknadListe from './components/SoknadListe';
+import SoknadListe from './pages/SoknadListe';
 import { Page } from '@navikt/ds-react/Page';
 import { Box } from '@navikt/ds-react';
-import Soknadsside from './components/Soknadsside';
+import Soknadsside from './pages/Soknadsside';
 
 function App() {
 	const [soknader, setSoknader] = useState<BehandletSoknad[]>([]);

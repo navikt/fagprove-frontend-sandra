@@ -8,7 +8,7 @@ import {
 	VStack,
 } from '@navikt/ds-react';
 import type { BehandletSoknad } from '../api/types';
-import StikkproveModal from './StikkproveModal';
+import StikkproveModal from '../components/StikkproveModal';
 
 const ANTALL_SOKNADER_PER_SIDE = 5;
 
