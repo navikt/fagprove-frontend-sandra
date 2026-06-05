@@ -1,73 +1,117 @@
-# React + TypeScript + Vite
+# fagprove-frontend-sandra
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for forenklet saksbehandlingssystem for foreldrepenger. Viser søknader i en tabell og detaljer for hver sak inkludert vedtaksresultat. Bygget med React, TypeScript og NAVs designsystem (Aksel).
 
-Currently, two official plugins are available:
+## Teknologier
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Teknologi        | Versjon | Formål                                                  |
+| ---------------- | ------- | ------------------------------------------------------- |
+| React            | 19      | UI-rammeverk med gjenbrukbare komponenter               |
+| TypeScript       | 6       | Typesikkerhet                                           |
+| Vite             | 8       | Byggverktøy med rask oppstart og HMR                    |
+| @navikt/ds-react | 8       | NAVs designsystem (Aksel) for tilgjengelige komponenter |
+| pnpm             | -       | Pakkehåndterer                                          |
+| Vitest           | 4       | Testrammeverk bygd for Vite                             |
 
-## React Compiler
+## Arkitektur
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Appen er en single-page application uten ruter. Tilstanden styres i `App.tsx` som bytter mellom to visninger:
 
-## Expanding the ESLint configuration
+- **SoknadListe** — tabell med alle søknader, paginering (5 per side) og stikkprøvekontroll
+- **Soknadsside** — detaljvisning med søknadsdetaljer, vedtaksdetaljer og inntektshistorikk
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Navigasjon mellom visningene bruker state i `App.tsx` i stedet for React Router, siden appen bare har to visninger. Pagineringsstaten beholdes når man går tilbake fra en sak.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Mappestruktur
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── App.tsx                  # Rotkomponent med tilstandsstyring
+├── main.tsx                 # Inngangspunkt, rendrer App
+├── api/
+│   ├── api.ts               # API-kall mot backend (GET /api/soknader)
+│   └── types.ts             # TypeScript-typer for søknad, vedtak og inntekt
+├── components/
+│   ├── Felt.tsx              # Gjenbrukbar label/verdi-komponent
+│   ├── Inntektshistorikk.tsx # Tabell med inntektshistorikk
+│   ├── SoknadInfo.tsx        # Samler søknads- og vedtaksdetaljer
+│   ├── Soknadsdetaljer.tsx   # Viser søknadsfelt i grid
+│   ├── StikkproveModal.tsx   # Modal for stikkprøvekontroll
+│   ├── Vedtaksdetaljer.tsx   # Viser vedtaksinfo basert på type
+│   └── VedtakTag.tsx         # Fargekodet tag for vedtakstype
+├── pages/
+│   ├── SoknadListe.tsx       # Søknadsoversikt med tabell og paginering
+│   └── Soknadsside.tsx       # Detaljside for en søknad
+└── utils/
+    ├── uttrekk.ts            # Logikk for proporsjonalt stikkprøveutvalg
+    └── uttrekk.test.ts       # Tester for uttrekkslogikken
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Dataflyt
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```mermaid
+graph LR
+    A[App.tsx] -->|fetch| B[GET /api/soknader]
+    B -->|BehandletSoknad array| A
+    A -->|liste| C[SoknadListe]
+    C -->|valgt søknad| A
+    A -->|valgt søknad| D[Soknadsside]
+    C -->|stikkprøve| E[StikkproveModal]
+    E -->|uttrekk| F[uttrekk.ts]
 ```
+
+### Kommunikasjon med backend
+
+Frontend kommuniserer med backend via ett REST-endepunkt:
+
+| Metode | Endepunkt       | Beskrivelse                     |
+| ------ | --------------- | ------------------------------- |
+| GET    | `/api/soknader` | Henter alle behandlede søknader |
+
+I utvikling proxyes `/api`-kall til `http://localhost:8080` via Vite sin dev-server (konfigurert i `vite.config.ts`). Hvis backenden er nede vises en feilmelding.
+
+### Vedtakstyper
+
+Vedtakene vises med fargekodede tags (`VedtakTag`-komponenten):
+
+| Vedtakstype       | Aksel-variant |
+| ----------------- | ------------- |
+| Innvilget         | `success`     |
+| Avslag            | `error`       |
+| Manuell vurdering | `warning`     |
+| Engangsstønad     | `info`        |
+
+### Stikkprøvekontroll
+
+Stikkprøvekontrollen åpnes som en modal fra søknadslisten. Uttrekksfunksjonen (`genererUttrekk` i `uttrekk.ts`) gjør et proporsjonalt utvalg: søknadene grupperes etter vedtakstype med `Object.groupBy`, og den angitte prosenten trekkes ut tilfeldig fra hver gruppe. Dette sikrer at alle vedtakstyper er proporsjonalt representert.
+
+Modalen har validering av input (1–100), viser «Trukket ut X av Y saker» og har Chips for filtrering på vedtakstype. Ved avrunding kan det totale antallet avvike noe fra den oppgitte prosenten.
+
+## Kjøre lokalt
+
+Forutsetninger: Node.js og pnpm.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Backend må kjøre på port 8080 for at API-kall skal fungere.
+
+## Bygge
+
+```bash
+pnpm build
+```
+
+## Tester
+
+```bash
+pnpm test
+```
+
+Tester for uttrekkslogikken (`uttrekk.test.ts`):
+
+- Proporsjonalt uttrekk per vedtakstype
+- Lav prosent gir tomt resultat
+- 100% returnerer alle saker
