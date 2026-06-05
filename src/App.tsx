@@ -4,16 +4,21 @@ import { hentSoknader } from './api/api';
 import type { BehandletSoknad } from './api/types';
 import SoknadListe from './pages/SoknadListe';
 import { Page } from '@navikt/ds-react/Page';
-import { Box } from '@navikt/ds-react';
+import { Box, GlobalAlert, Loader } from '@navikt/ds-react';
 import Soknadsside from './pages/Soknadsside';
 
 function App() {
 	const [soknader, setSoknader] = useState<BehandletSoknad[]>([]);
 	const [valgtSoknad, setValgtSoknad] = useState<BehandletSoknad | null>(null);
 	const [side, setSide] = useState(1);
+	const [laster, setLaster] = useState(true);
+	const [feil, setFeil] = useState<string | null>(null);
 
 	useEffect(() => {
-		hentSoknader().then(setSoknader);
+		hentSoknader()
+			.then(setSoknader)
+			.catch((error) => setFeil(error.message))
+			.finally(() => setLaster(false));
 	}, []);
 
 	return (
@@ -26,7 +31,18 @@ function App() {
 				</Box>
 			</Page.Block>
 			<Page.Block as="main" width="xl" gutters>
-				{valgtSoknad ? (
+				{laster ? (
+					<Loader size="xlarge" title="Laster søknader" />
+				) : feil ? (
+					<GlobalAlert status="error">
+						<GlobalAlert.Header>
+							<GlobalAlert.Title>{feil}</GlobalAlert.Title>
+						</GlobalAlert.Header>
+						<GlobalAlert.Content>
+							Kunne ikke laste søknader. Prøv igjen senere.
+						</GlobalAlert.Content>
+					</GlobalAlert>
+				) : valgtSoknad ? (
 					<Soknadsside
 						behandletSoknad={valgtSoknad}
 						onTilbake={() => setValgtSoknad(null)}
